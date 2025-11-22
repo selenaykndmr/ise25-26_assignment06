@@ -1,3 +1,4 @@
 [tools]
 java = 'temurin-21'
-maven = '3.9'
+"asdf:maven" = '3.9' # https://github.com/jdx/mise/discussions/7016, https://github.com/jdx/mise/discussions/6983
+
