@@ -1,44 +1,43 @@
-package de.seuhd.campuscoffee.api.dtos;
+package de.seuhd.campuscoffee.tests.system;
 
-import de.seuhd.campuscoffee.api.mapper.PosDtoMapper;
+import de.seuhd.campuscoffee.domain.model.User;
 import de.seuhd.campuscoffee.domain.tests.TestFixtures;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+public class UsersSystemTests extends AbstractSysTest {
 
-public class PosDtoTest {
-    private static Validator validator;
-    private static PosDtoMapper posDtoMapper;
+    //TODO: Uncomment once user endpoint is implemented
 
-    @BeforeAll
-    static void beforeAll() {
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-        posDtoMapper = Mappers.getMapper(PosDtoMapper.class);
+    @Test
+    void createUser() {
+        User userToCreate = TestFixtures.getUserListForInsertion().getFirst();
+        User createdUser = userDtoMapper.toDomain(userRequests.create(List.of(userDtoMapper.fromDomain(userToCreate))).getFirst());
+
+
+        assertEqualsIgnoringIdAndTimestamps(createdUser, userToCreate);
+    }
+
+    //TODO: Add at least two additional tests for user operations
+
+    @Test
+    void deleteUser() {
+        User userToCreate = TestFixtures.getUserListForInsertion().getFirst();
+        var createdDto = userRequests.create(List.of(userDtoMapper.fromDomain(userToCreate))).getFirst();
+
+        userRequests.delete(createdDto.id());
+
+        assertNotNull(createdDto.id());
     }
 
     @Test
-    void validPosDto() {
-        PosDto validPosDto = posDtoMapper.fromDomain(TestFixtures.getPosList().getFirst());
-        Set<ConstraintViolation<PosDto>> violations = validator.validate(validPosDto);
-        assertTrue(violations.isEmpty());
+    void getAllUsers() {
+        var users = userRequests.getAll();
+
+        assertNotNull(users);
+
     }
 
-    @Test
-    void invalidCity_empty() {
-        PosDto validPosDto = posDtoMapper.fromDomain(TestFixtures.getPosList().getFirst());
-        PosDto invalidPosDto = validPosDto.toBuilder().city("").build();
-        Set<ConstraintViolation<PosDto>> violations = validator.validate(invalidPosDto);
-        assertFalse(violations.isEmpty());
-    }
 }
